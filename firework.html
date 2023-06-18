@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>大小姐生日快乐！</title>
+</head>
+<body>
+<script type="text/javascript">
+    !(function () {
+        var canvas = document.createElement("canvas");
+        document.body.appendChild(canvas);
+
+        var context = canvas.getContext("2d");
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            clearCanvas();
+        }
+        function clearCanvas() {
+            context.fillStyle = "#000000";
+            context.fillRect(0, 0, canvas.width, canvas.height);
+        }
+
+        resizeCanvas();
+
+        window.addEventListener("resize", resizeCanvas);
+
+        //鼠标点击发射烟花
+        document.addEventListener("mousedown", function (e) {
+            var x = e.clientX;
+            var y = e.clientY;
+            createLaunchFireworks(x, window.innerHeight, x, y, "");
+        });
+
+
+        //每0.5秒
+        setInterval(function () {
+            var x = Math.random() * canvas.width;
+            var y = Math.random() * canvas.height;
+            if (y < window.innerHeight / 5 || y > window.innerHeight * 2 / 5)
+                createLaunchFireworks(x, window.innerHeight, x, y, "");
+        }, 500);
+
+        //每一秒发射一数组中元素
+        var num = 0;
+        setInterval(function () {
+            //电脑浏览样式,浏览器宽度大于长度
+            var array;
+            if (window.innerWidth > window.innerHeight) {
+                array = [{"text": "张", "x": window.innerWidth / 11, "y": window.innerHeight * 3 / 10},
+                    {"text": "景", "x": window.innerWidth * 2 / 11, "y": window.innerHeight * 4 / 10},
+                    {"text": "秀", "x": window.innerWidth * 3 / 11, "y": window.innerHeight * 7 / 20},
+                    {"text": "大", "x": window.innerWidth *4 / 11, "y": window.innerHeight * 3 / 11},
+                    {"text": "小", "x": window.innerWidth * 5 / 11, "y": window.innerHeight * 3 / 10},
+                    {"text": "姐", "x": window.innerWidth * 6 / 11, "y": window.innerHeight / 3},
+                    {"text": "生", "x": window.innerWidth * 7 / 11, "y": window.innerHeight * 3 / 11},
+                    {"text": "日", "x": window.innerWidth * 8 / 11, "y": window.innerHeight * 4 / 11},
+                    {"text": "快", "x": window.innerWidth * 9 / 11, "y": window.innerHeight / 3},
+                    {"text": "乐", "x": window.innerWidth * 10 / 11, "y": window.innerHeight / 3}];
+            }
+            //手机浏览样式
+            else {
+                array = [{"text": "张", "x": window.innerWidth / 4, "y": window.innerHeight / 3},
+                    {"text": "景", "x": window.innerWidth / 2, "y": window.innerHeight / 3},
+                    {"text": "秀", "x": window.innerWidth * 3 / 4, "y": window.innerHeight / 3},
+                    {"text": "大", "x": window.innerWidth / 4, "y": window.innerHeight  / 2},
+                    {"text": "小", "x": window.innerWidth * 2 / 4, "y": window.innerHeight / 2},
+                    {"text": "姐", "x": window.innerWidth * 3 / 4, "y": window.innerHeight / 2},
+                    {"text": "生", "x": window.innerWidth / 5, "y": window.innerHeight * 2 / 3},
+                    {"text": "日", "x": window.innerWidth * 2 / 5, "y": window.innerHeight * 2 / 3},
+                    {"text": "快", "x": window.innerWidth * 3 / 5, "y": window.innerHeight * 2 / 3},
+                    {"text": "乐", "x": window.innerWidth * 4 / 5, "y": window.innerHeight * 2 / 3}];
+            }
+            function $(text, x, y) {
+                createLaunchFireworks(x, window.innerHeight, x, y, text);
+            }
+            $(array[num % array.length].text, array[num % array.length].x, array[num % array.length].y);
+            num += 1;
+        }, window.innerWidth > window.innerHeight ? 1000:1500);
+
+
+        //每六秒在浏览器左右两边随机发射流星
+        setInterval(function () {
+            var y = Math.random() * canvas.height;
+            createLaunchFireworks(window.innerWidth, y, -500, y - window.innerHeight / 4);
+
+        }, 6000);
+        setInterval(function () {
+            var y = Math.random() * canvas.height;
+            createLaunchFireworks(0, y, window.innerWidth + 500, y - window.innerHeight / 4);
+        }, 6000);
+
+
+        //烟花爆炸，创建爆炸后的粒子
+        var particles = [];
+        function createFireworks(x, y) {
+            var count = 200; //爆炸后的粒子数量
+            for (var i = 0; i < count; i ++) {
+                var angle = 360 / count * i;
+                var radians = angle * Math.PI / 180;
+
+                var hue = Math.floor(Math.random() * 51) + 150;
+                var hueVariance = 30;
+
+                var p = {};
+
+                p.x = x;
+                p.y = y;
+                p.radians = radians;
+
+                p.size = 1.2;
+
+                p.speed = (Math.random() * 5) + .4;
+                p.radius = p.speed;
+                p.hue = Math.floor(Math.random() * ((hue + hueVariance) - (hue - hueVariance))) + (hue - hueVariance) * 10;
+                p.brightness = Math.floor(Math.random() * 31) + 55;
+                p.alpha = (Math.floor(Math.random() * 61) + 40) / 100;
+
+                particles.push(p);
+            }
+        }
+
+        //烟花爆炸后的运动轨迹
+        function drawFireworks() {
+            for (var i = 0; i < particles.length; i++) {
+                var p = particles[i];
+
+                var vx = Math.cos(p.radians) * p.radius;
+                var vy = Math.sin(p.radians) * p.radius + 0.4;
+
+                p.x += vx;
+                p.y += vy;
+
+                p.radius *= 1 - p.speed / 150;
+
+                p.alpha -= 0.007;
+
+                if (p.alpha <= 0) {
+                    particles.splice(i, 1);
+                    continue;
+                }
+
+                context.beginPath();
+                context.arc(p.x, p.y, p.size, 0, Math.PI*2, false);
+                context.closePath();
+                context.fillStyle = "hsla(" + p.hue + ",100%," + p.brightness + "%," + p.alpha + ")";
+                context.fill();
+
+            }
+        }
+
+        //创建烟花/流星发射时的粒子
+        var points = [];
+        function createLaunchFireworks(x, y, endX, endY, text) {
+            var p = {};
+            p.x = x;
+            p.y = y;
+            p.endX = endX;
+            p.endY = endY;
+            p.text = text;
+
+            p.size = 2;
+            p.move = 0;
+
+            var width = endX - x;
+            var height = endY - y;
+            p.vx = width / Math.sqrt((width * width) + (height * height));
+            p.vy = height / Math.sqrt((width * width) + (height * height));
+
+            var hue = Math.floor(Math.random() * 51) + 150;
+            var hueVariance = 30;
+            p.hue = Math.floor(Math.random() * ((hue + hueVariance) - (hue - hueVariance))) + (hue - hueVariance) * 10;
+            p.brightness = Math.floor(Math.random() * 31) + 50;
+            p.alpha = (Math.floor(Math.random() * 61) + 40) / 100;
+
+            points.push(p);
+        }
+
+        //烟花/流星的运动轨迹
+        function drawLaunchFireworks() {
+            clearCanvas();
+            for (var i = 0; i < points.length; i++) {
+
+                var p = points[i];
+                var x = p.x + p.vx * p.move;
+                var y = p.y + p.vy * p.move;
+
+                p.move += 5;
+                p.alpha += 0.1;
+
+                if ((p.vy < 0 && y < p.endY) || (p.vy > 0 && y > p.endY)) {//如果粒子到达目标坐标
+                    points.splice(i, 1);//删除该粒子
+                    createFireworks(p.endX, p.endY);//创建烟花
+                    drawText(p);//创建文本
+                    continue;
+                }
+                context.beginPath();
+                context.arc(x, y, p.size, 0, Math.PI*2, false);
+                context.closePath();
+                context.fillStyle = "hsla(" + p.hue + ",100%," + p.brightness + "%," + p.alpha + ")";
+                context.fill();
+            }
+            drawFireworks();//执行烟花轨迹
+        }
+
+        //创建文本
+        function drawText(p) {
+            context.font = "180px SimSun";
+            if (p.text == "Jack")
+                context.font = "120px SimSun";
+            else if (p.text == "2" || p.text == "0")
+                context.font = "250px SimSun"
+            context.textAlign="center";
+            context.textBaseline = "middle";
+            context.fillStyle = "hsla(" + p.hue + ",100%," + p.brightness + "%," + p.alpha + ")";
+            context.fillText(p.text, p.endX, p.endY);
+            context.restore();
+        }
+
+        //随着页面的刷新而执行
+        function tick() {
+            context.globalCompositeOperation = "destination-out";
+            context.fillStyle = "rgba(0, 0, 0, " + 10 / 100 + ")";
+            context.fillRect(0, 0, canvas.width, canvas.height);
+            context.globalCompositeOperation = "lighter";
+
+            drawLaunchFireworks();
+            requestAnimationFrame(tick);
+        }
+        tick();
+    })();
+</script>
+</body>
+</html>
