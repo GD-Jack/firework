@@ -1,5 +1,5 @@
 # 烟花特效
-![](.\firework.png)
+![](https://raw.githubusercontent.com/GD-Jack/firework/main/firework.png)
 
 ## 修改如下片段，修改固定的烟花爆炸的位置及爆炸后显示的文字
 ```JavaScript
